@@ -4,11 +4,8 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.LongAccumulator;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by vyacheslav.mischeryakov
