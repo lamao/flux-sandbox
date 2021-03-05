@@ -2,6 +2,7 @@ package org.sandbox.flux;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,24 +18,33 @@ public class TestFlux {
     public void test() {
 
         int batchSize = 10;
-        int batchCount = 3;
+        int batchCount = 40;
 
         final LongAccumulator sum = new LongAccumulator(Long::sum, 0);
         List<Integer> elements = new ArrayList<>();
 
         Flux.range(1, batchCount)
-                .log()
+                .parallel(2)
+                .runOn(Schedulers.parallel())
                 .map(index -> calculateResult(index, batchSize))
                 .log()
+                .sequential()
                 .doOnNext(sum::accumulate)
+                .doOnNext(elements::add)
                 .log()
-                .subscribe(elements::add);
+                .blockLast();
 
         System.out.println(sum.longValue());
         System.out.println(elements);
+        System.out.println("Completed");
     }
 
     private int calculateResult(int index, int batchSize) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return index * batchSize;
     }
 
